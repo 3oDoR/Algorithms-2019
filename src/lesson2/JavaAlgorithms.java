@@ -3,10 +3,11 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -37,10 +38,46 @@ public class JavaAlgorithms {
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
     static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {
-        throw new NotImplementedError();
-    }
+        List<Integer> res = new ArrayList<>();
+        int min = 0;
+        int max = 0;
+        int check = 0;
 
-        /**
+        Pair<Integer, Integer> pair = new Pair<>(0, 0);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                res.add(Integer.parseInt(line));
+            }
+//            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < res.size() - 1; i++) {
+            if (res.get(i) < res.get(i + 1)) {
+                if (check == 0 || check > res.get(i)) {
+                    check = res.get(i);
+                    for (int j = i + 1; j < res.size(); j++) {
+
+                           if (res.get(i) < res.get(j)) {
+                            min = res.get(j) - res.get(i);
+                        }
+                        if (min > max) {
+                            max = min;
+                            pair = new Pair<>(i + 1, j + 1);
+                        }
+                        min = 0;
+                    }
+                }
+            }
+
+        }
+        return pair;
+    }
+    //Трудоемкость:O(nm)
+
+
+    /**
      * Задача Иосифа Флафия.
      * Простая
      * <p>
@@ -90,43 +127,13 @@ public class JavaAlgorithms {
      * но приветствуется попытка решить её самостоятельно.
      */
     static public int josephTask(int menNumber, int choiceInterval) {
-       throw new NotImplementedError();
-
-//        if (choiceInterval < 1 || menNumber < 1) throw new IllegalArgumentException();
-//        List<Integer> res = new ArrayList();
-//
-//        for (int i = 0; i < menNumber; i++) {
-//            res.add(i + 1);
-//        }
-//
-//        int index = 0;
-//        int numb = 0;
-//        int size = res.size() - 1;
-//        int result = 1;
-//
-//        while (res.size() != 1) {
-//            numb = index;
-//
-//            for (int i = numb; i < numb + choiceInterval - 1; i++) {
-//                if (index != res.size() - 1) {
-//                    index++;
-//                } else {
-//                    index = 0;
-//                }
-//            }
-//            if (index == res.size() - 1) {
-//                res.remove(index);
-//                index = 0;
-//            } else {
-//                res.remove(index);
-//            }
-//        }
-//        for (int i : res) {
-//           return i;
-//        }
-//        return result;
-
+        int res = 0;
+        for (int i = 1; i <= menNumber; i++)
+            res = (res + choiceInterval) % i;
+        return res + 1;
     }
+
+    //Трудоемкость:O(n)
 
 
     /**
@@ -141,8 +148,42 @@ public class JavaAlgorithms {
      * вернуть ту из них, которая встречается раньше в строке first.
      */
     static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+        char[] firstWord = firs.toCharArray();
+        char[] secondWord = second.toCharArray();
+        int[][] matrix = new int[firstWord.length][secondWord.length];
+        int min = 0;
+        int max = 0;
+        String res = "";
+
+        for (int i = 0; i < firstWord.length; i++) {
+            for (int j = 0; j < secondWord.length; j++) {
+                if (firstWord[i] == secondWord[j]) {
+                    if (i == 0 || j == 0) {
+                        matrix[i][j] = 1;
+                    } else {
+                        matrix[i][j] = matrix[i - 1][j - 1] + 1;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < firstWord.length; i++) {
+            for (int j = 0; j < secondWord.length; j++) {
+                if (matrix[i][j] > min) {
+                    min = matrix[i][j];
+                    max = i;
+                }
+            }
+        }
+        min -= 1;
+
+        for (int i = max - min; i <= max; i++) {
+            res += (Character) firstWord[i];
+        }
+
+        return res;
     }
+
+    //Трудоемкость:O(nm)
 
     /**
      * Число простых чисел в интервале
@@ -155,8 +196,21 @@ public class JavaAlgorithms {
      * Единица простым числом не считается.
      */
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        if (limit <= 1) return 0;
+        int[] number = new int[limit + 1];
+        int result = 0;
+
+        for (int i = 2; i <= limit; i++) {
+            if (number[i] == 0) {
+                result++;
+                for (int j = 2; i * j <= limit; j++) {
+                    number[i * j] = 1;
+                }
+            }
+        }
+        return result;
     }
+    //Трудоемкость:O(n)
 
 
     /**
