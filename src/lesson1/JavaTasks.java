@@ -4,8 +4,6 @@ import kotlin.NotImplementedError;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -44,45 +42,79 @@ public class JavaTasks {
      */
     static public void sortTimes(String inputName, String outputName) {
         List<String> am = new ArrayList<>();
+        List<String> twelveAM = new ArrayList<>();
         List<String> pm = new ArrayList<>();
+        List<String> twelvePM = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
+
         Pattern pattern = Pattern.compile("([0][0-9]|[1][0-2])([:])([0-5][0-9])([:])([0-5][0-9])([ ])([P][M]|[A][M])");
         Pattern patternAM = Pattern.compile("([A][M])");
 
-        try {
-            List<String> lines = Files.readAllLines(Paths.get(inputName));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String twelve = line.split(":")[0];
 
-            for (String line : lines) {
                 boolean matcher = patternAM.matcher(line).find();
                 boolean matches = pattern.matcher(line).matches();
 
                 if (!matches) {
-                    throw new Exception();
+                    throw new IllegalArgumentException();
                 }
+
                 if (matcher) {
-                    am.add(line);
+                    if (twelve.equals("12")) {
+                        twelveAM.add(line);
+                    } else {
+                        am.add(line);
+                    }
+
                 } else {
-                    pm.add(line);
+                    if (twelve.equals("12")) {
+                        twelvePM.add(line);
+                    } else {
+                        pm.add(line);
+                    }
+
                 }
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            throw new IllegalArgumentException();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException();
         }
-        Collections.reverse(am);
-        Collections.reverse(pm);
-        am.addAll(pm);
+
+        Collections.sort(am);       //O(n*log(n))
+        Collections.sort(twelveAM);
+        Collections.sort(pm);
+        Collections.sort(twelvePM);
 
         try (FileWriter writer = new FileWriter(outputName)) {
+            for (String str : twelveAM) {
+                writer.write(str);
+                writer.append('\n');
+            }
             for (String str : am) {
+                writer.write(str);
+                writer.append('\n');
+            }
+            for (String str : twelvePM) {
+                writer.write(str);
+                writer.append('\n');
+            }
+            for (String str : pm) {
                 writer.write(str);
                 writer.append('\n');
             }
             writer.flush();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException();
         }
     }
+
+    //Трудоемкость:O(n)
+    //Ресурсоёмкость:O(n)
 
     /**
      * Сортировка адресов
@@ -115,12 +147,9 @@ public class JavaTasks {
         Pattern pattern = Pattern.compile("([А-Яа-я]+)([ ])([А-Яа-я]+)([ ])([-])([ ])([А-Яа-я]+)([ ][0-9]+)");
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {                                                            //O(n)
+            String line;
+            while ((line = reader.readLine()) != null) {                                                            //O(n)
                 boolean matches = line.matches(String.valueOf(pattern));
-//                if (!matches) {
-//                    throw new Exception();
-//                }
 
                 String key = line.split(" - ")[1].trim();
                 String value = line.split(" - ")[0].trim();
@@ -129,38 +158,38 @@ public class JavaTasks {
                 } else {
                     map.put(key, value);
                 }
-
             }
-            reader.close();
+        } catch (FileNotFoundException ex) {
+            throw new IllegalArgumentException();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException();
+        }
 
-            File file = new File(outputName);
-            FileWriter fileWriter = new FileWriter(file);
-            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-            Stream stream = map.entrySet().stream().sorted(new Comparator<Map.Entry<String, String>>() {
-                @Override
-                public int compare(Map.Entry<String, String> stringStringEntry, Map.Entry<String, String> t1) {
-                    String key1 = stringStringEntry.getKey();
-                    String key2 = t1.getKey();
+        File file = new File(outputName);
 
-                    String[] split = key1.split("\\s+");
-                    String street1 = split[0];
-                    Integer house1 = null;
-                    if (split.length > 1) {
-                        house1 = Integer.parseInt(split[1]);
-                    }
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+            Stream stream = map.entrySet().stream().sorted((stringStringEntry, t1) -> {
+                String key1 = stringStringEntry.getKey();
+                String key2 = t1.getKey();
 
-                    split = key2.split("\\s+");
-                    String street2 = split[0];
-                    Integer house2 = null;
-                    if (split.length > 1) {
-                        house2 = Integer.parseInt(key2.split("\\s+")[1]);
-                    }
-                    if (street1.compareTo(street2) == 0 && house1 != null && house2 != null) {
-                        return house1.compareTo(house2);
-                    }
-
-                    return street1.compareTo(street2);
+                String[] split = key1.split("\\s+");
+                String street1 = split[0];
+                Integer house1 = null;
+                if (split.length > 1) {
+                    house1 = Integer.parseInt(split[1]);
                 }
+
+                split = key2.split("\\s+");
+                String street2 = split[0];
+                Integer house2 = null;
+                if (split.length > 1) {
+                    house2 = Integer.parseInt(key2.split("\\s+")[1]);
+                }
+                if (street1.compareTo(street2) == 0 && house1 != null && house2 != null) {
+                    return house1.compareTo(house2);
+                }
+
+                return street1.compareTo(street2);
             });
 
             Iterator iterator = stream.iterator();
@@ -169,71 +198,20 @@ public class JavaTasks {
                 entry = (Map.Entry) iterator.next();
                 String unValue = entry.getValue().toString().trim();
                 String[] unsortedValues = unValue.split(",");
-                Arrays.sort(unsortedValues, new Comparator<String>() {
-                    @Override
-                    public int compare(String s, String t1) {
-
-                        String lastName = null;
-                        String firstName = null;
-                        String lastName1 = null;
-                        String firstName1 = null;
-
-                        String[] split = s.split("\\s+");
-                        for (String str : split) {
-                            if (str != null && !str.isEmpty()) {
-                                if (lastName == null) {
-                                    lastName = str;
-                                } else firstName = str;
-                            }
-                        }
-                        split = t1.split("\\s+");
-                        for (String str : split) {
-                            if (str != null && !str.isEmpty()) {
-                                if (lastName1 == null) {
-                                    lastName1 = str;
-                                } else firstName1 = str;
-                            }
-                        }
-                        for (int i = 0; i < Math.min(lastName.length(), lastName1.length()); i++) {
-                            if (lastName.charAt(i) < lastName1.charAt(i)) {
-                                return -1;
-                            } else if (lastName.charAt(i) > lastName1.charAt(i)) {
-                                return 1;
-                            }
-                        }
-                        if (lastName.length() < lastName1.length()) {
-                            return -1;
-                        } else if (lastName.length() > lastName1.length()) {
-                            return 1;
-                        }
-
-                        for (int i = 0; i < Math.min(firstName.length(), firstName1.length()); i++) {
-                            if (firstName.charAt(i) < firstName1.charAt(i)) {
-                                return -1;
-                            } else if (firstName.charAt(i) > firstName1.charAt(i)) {
-                                return 1;
-                            }
-                        }
-                        if (firstName.length() < firstName1.length()) {
-                            return -1;
-                        } else if (firstName.length() > firstName1.length()) {
-                            return 1;
-                        }
-
-                        return 0;
-                    }
-                });
+                Arrays.sort(unsortedValues);
 
                 writer.write(entry.getKey() + " - " + String.join(", ", unsortedValues).trim());
                 writer.write("\n");
             }
-            fileWriter.close();
-            writer.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException();
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
         }
     }
+
+    //Трудоемкость:O(n)
+    //Ресурсоёмкость:O(n)
 
     /**
      * Сортировка температур
@@ -318,6 +296,14 @@ public class JavaTasks {
      */
     static <T extends Comparable<T>> void mergeArrays(T[] first, T[] second) {
         System.arraycopy(first, 0, second, 0, first.length);
-            Arrays.sort(second);
+        Arrays.sort(second);
     }
+
+    //Трудоемкость:(n*log(n))
+    //Ресурсоёмкость:O(n)
+
+
+
+
+
 }

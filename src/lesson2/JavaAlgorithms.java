@@ -46,20 +46,21 @@ public class JavaAlgorithms {
         Pair<Integer, Integer> pair = new Pair<>(0, 0);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName)))) {
             String line;
+
             while ((line = reader.readLine()) != null) {
                 res.add(Integer.parseInt(line));
             }
-//            reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException();
         }
+
         for (int i = 0; i < res.size() - 1; i++) {
             if (res.get(i) < res.get(i + 1)) {
                 if (check == 0 || check > res.get(i)) {
                     check = res.get(i);
-                    for (int j = i + 1; j < res.size(); j++) {
 
-                           if (res.get(i) < res.get(j)) {
+                    for (int j = i + 1; j < res.size(); j++) {
+                        if (res.get(i) < res.get(j)) {
                             min = res.get(j) - res.get(i);
                         }
                         if (min > max) {
@@ -75,6 +76,7 @@ public class JavaAlgorithms {
         return pair;
     }
     //Трудоемкость:O(nm)
+    //Ресурсоёмкость:O(n)
 
 
     /**
@@ -134,6 +136,7 @@ public class JavaAlgorithms {
     }
 
     //Трудоемкость:O(n)
+    //Ресурсоёмкость:O(1)
 
 
     /**
@@ -184,6 +187,7 @@ public class JavaAlgorithms {
     }
 
     //Трудоемкость:O(nm)
+    //Ресурсоёмкость:O(nm)
 
     /**
      * Число простых чисел в интервале
@@ -197,7 +201,7 @@ public class JavaAlgorithms {
      */
     static public int calcPrimesNumber(int limit) {
         if (limit <= 1) return 0;
-        int[] number = new int[limit + 1];
+        byte[] number = new byte[limit + 1];
         int result = 0;
 
         for (int i = 2; i <= limit; i++) {
@@ -210,7 +214,8 @@ public class JavaAlgorithms {
         }
         return result;
     }
-    //Трудоемкость:O(n)
+    //Трудоемкость:O(nm)
+    //Ресурсоёмкость:O(n)
 
 
     /**
