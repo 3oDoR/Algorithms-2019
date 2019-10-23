@@ -1,5 +1,6 @@
 package lesson2
 
+import org.junit.jupiter.api.Assertions
 import java.io.BufferedWriter
 import java.io.File
 import java.util.*
@@ -46,8 +47,19 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(3 to 4, optimizeBuyAndSell("input/buysell_in1.txt"))
         assertEquals(8 to 12, optimizeBuyAndSell("input/buysell_in2.txt"))
         assertEquals(3 to 4, optimizeBuyAndSell("input/buysell_in3.txt"))
+        //My tests
         assertEquals(1 to 3, optimizeBuyAndSell("input/buysell_in4.txt"))
         assertEquals(1 to 1000, optimizeBuyAndSell("input/buysell_in5.txt"))
+
+        try {
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                optimizeBuyAndSell("input/buysell_in6.txt")
+            }
+        } finally {
+            File("temp_prices.txt").delete()
+        }
+        //End
+
         try {
             val expectedAnswer = generatePrices(1000)
             assertEquals(expectedAnswer, optimizeBuyAndSell("temp_prices.txt"))
@@ -69,7 +81,9 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(3, josephTask(8, 5))
         assertEquals(28, josephTask(40, 3))
         assertEquals(28, josephTask(40, 3))
+        //My tests
         assertEquals(604, josephTask(1000, 3))
+        //End
         var menNumber = 2
         for (i in 1..20) {
             assertEquals(1, josephTask(menNumber, 2))
@@ -78,9 +92,12 @@ abstract class AbstractAlgorithmsTests {
     }
 
     fun longestCommonSubstring(longestCommonSubstring: (String, String) -> String) {
+        //My Tests
         assertEquals("", longestCommonSubstring("Пока", ""))
         assertEquals("ород", longestCommonSubstring("Город", "Огород"))
         assertEquals("", longestCommonSubstring("привет", "ПРИВЕТ"))
+
+        //End
 
         assertEquals("", longestCommonSubstring("мой мир", "я"))
         assertEquals("зд", longestCommonSubstring("здравствуй мир", "мы здесь"))
@@ -152,7 +169,10 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(148933, calcPrimesNumber(2000000))
         assertEquals(348513, calcPrimesNumber(5000000))
         assertEquals(664579, calcPrimesNumber(10000000))
+        //My Tests
         assertEquals(9610, calcPrimesNumber(100250))
+        assertEquals(0, calcPrimesNumber(-100))
+        //End
 
     }
 

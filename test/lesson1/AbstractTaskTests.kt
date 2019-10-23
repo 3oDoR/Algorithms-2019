@@ -1,6 +1,7 @@
 package lesson1
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import util.PerfResult
 import util.estimate
 import java.io.BufferedWriter
@@ -45,6 +46,38 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        // My tests
+        try {
+            sortTimes("input/time_in5.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                    12:12:20 AM
+                    12:18:19 AM
+                    12:53:25 AM
+                    02:00:30 AM
+                    04:54:15 AM
+                    05:57:30 AM
+                    09:08:06 AM
+                    01:06:58 PM
+                    02:24:59 PM
+                    03:29:11 PM
+                    05:06:44 PM
+                    05:21:54 PM
+                    09:03:45 PM
+                    
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) {
+                sortTimes("input/time_in4.txt", "temp.txt")
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
@@ -73,6 +106,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        // My tests
         try {
             sortAddresses("input/addr_in4.txt", "temp.txt")
             assertFileContent(
@@ -83,6 +117,14 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                     ВТретий 3 - Самый Третий
                 """.trimIndent()
             )
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try {
+            assertThrows(IllegalArgumentException::class.java) {
+                sortAddresses("input/addr_in5.txt", "temp.txt")
+            }
         } finally {
             File("temp.txt").delete()
         }
@@ -290,6 +332,47 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        //My tests
+        try {
+            sortSequence("input/seq_in7.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                        78
+                        13
+                        45
+                        49
+                        85
+                        45
+                        91
+                        41
+                        78
+                        13
+                        45
+                        49
+                        85
+                        45
+                        91
+                        41
+                        788
+                        32
+                        32
+                        32
+                        32
+                    """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) {
+                sortSequence("input/seq_in6.txt", "temp.txt")
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
+
+
 
         fun testGeneratedSequence(totalSize: Int, answerSize: Int): PerfResult<Unit> {
             try {
@@ -340,7 +423,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         mergeArrays(arrayOf(4, 9, 15, 20, 23), result)
         assertArrayEquals(arrayOf(1, 3, 4, 9, 9, 13, 15, 18, 20, 23, 23), result)
 
-
+        // My tests
         val myResult = arrayOf(null, null, 6, 5, 4, 3, 2, 1)
         mergeArrays(arrayOf(7, 8), myResult)
         assertArrayEquals(arrayOf(1, 2, 3, 4, 5, 6, 7, 8), myResult)

@@ -45,7 +45,6 @@ public class JavaTasks {
         List<String> twelveAM = new ArrayList<>();
         List<String> pm = new ArrayList<>();
         List<String> twelvePM = new ArrayList<>();
-        List<String> lines = new ArrayList<>();
 
         Pattern pattern = Pattern.compile("([0][0-9]|[1][0-2])([:])([0-5][0-9])([:])([0-5][0-9])([ ])([P][M]|[A][M])");
         Pattern patternAM = Pattern.compile("([A][M])");
@@ -144,12 +143,16 @@ public class JavaTasks {
      */
     static public void sortAddresses(String inputName, String outputName) {
         Map<String, String> map = new HashMap<>();
-        Pattern pattern = Pattern.compile("([А-Яа-я]+)([ ])([А-Яа-я]+)([ ])([-])([ ])([А-Яа-я]+)([ ][0-9]+)");
+        Pattern pattern = Pattern.compile("([А-Яа-яA-Za-zёЁ-]+)([ ])([А-Яа-яA-Za-zёЁ-]+)([ ])([-])([ ])([А-Яа-яA-Za-zёЁ-]+)([ ][0-9]+)");
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {                                                            //O(n)
                 boolean matches = line.matches(String.valueOf(pattern));
+
+                if (!matches) {
+                    throw new IllegalArgumentException();
+                }
 
                 String key = line.split(" - ")[1].trim();
                 String value = line.split(" - ")[0].trim();
@@ -277,8 +280,74 @@ public class JavaTasks {
      * 2
      */
     static public void sortSequence(String inputName, String outputName) {
-        throw new NotImplementedError();
+        List<Integer> mas = new ArrayList<>();
+        int length = 1;
+        int maxLength = 0;
+        Integer number = -1;
+
+        Pattern pattern = Pattern.compile("([0-9]+)");
+
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                boolean matches = line.matches(String.valueOf(pattern));
+
+                Integer i = Integer.parseInt(line);
+
+                if (!matches) {
+                    throw new IllegalArgumentException();
+                }
+
+                if (i < 0) {
+                    throw new IllegalArgumentException();
+                }
+                mas.add(i);
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
+
+        List<Integer> sortedMas = new ArrayList<>(mas);
+        Collections.sort(sortedMas);
+
+        for (int i = 0; i < sortedMas.size() - 1; i++) {
+            if (sortedMas.get(i).equals(sortedMas.get(i + 1))) {
+                length++;
+            } else {
+                length = 1;
+            }
+            if (length == maxLength && number > sortedMas.get(i)) {
+                number = sortedMas.get(i);
+            }
+            if (length > maxLength) {
+                maxLength = length;
+                number = sortedMas.get(i);
+            }
+
+        }
+
+        File file = new File(outputName);
+
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+            for (Integer num : mas) {
+                if (!num.equals(number)) {
+                    writer.write(num.toString());
+                    writer.append('\n');
+                }
+            }
+            for (int i = 0; i < maxLength; i++) {
+                writer.write(number.toString());
+                writer.append('\n');
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
     }
+    //Трудоемкость:O(n)
+    //Ресурсоёмкость:O(n)
 
     /**
      * Соединить два отсортированных массива в один
@@ -297,13 +366,13 @@ public class JavaTasks {
     static <T extends Comparable<T>> void mergeArrays(T[] first, T[] second) {
         System.arraycopy(first, 0, second, 0, first.length);
         Arrays.sort(second);
+
+
     }
+
 
     //Трудоемкость:(n*log(n))
     //Ресурсоёмкость:O(n)
-
-
-
 
 
 }

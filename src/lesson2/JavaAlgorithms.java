@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class JavaAlgorithms {
@@ -38,44 +39,91 @@ public class JavaAlgorithms {
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
     static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {
-        List<Integer> res = new ArrayList<>();
+//        List<Integer> res = new ArrayList<>();
+//        int min = 0;
+//        int max = 0;
+//        int check = 0;
+//
+//        Pair<Integer, Integer> pair = new Pair<>(0, 0);
+//        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName)))) {
+//            String line;
+//
+//            while ((line = reader.readLine()) != null) {
+//                res.add(Integer.parseInt(line));
+//            }
+//        } catch (IOException e) {
+//            throw new IllegalArgumentException();
+//        }
+//
+//        for (int i = 0; i < res.size() - 1; i++) {
+//            if (res.get(i) < res.get(i + 1)) {
+//                if (check == 0 || check > res.get(i)) {
+//                    check = res.get(i);
+//
+//                    for (int j = i + 1; j < res.size(); j++) {
+//                        if (res.get(i) < res.get(j)) {
+//                            min = res.get(j) - res.get(i);
+//                        }
+//                        if (min > max) {
+//                            max = min;
+//                            pair = new Pair<>(i + 1, j + 1);
+//                        }
+//                        min = 0;
+//                    }
+//                }
+//            }
+//
+//        }
+//        return pair;
+//    }
+        // Трудоемкость:O(nm)(Прошлого кода)
+        //Ресурсоёмкость:O(n)(Прошлого кода)
+
         int min = 0;
         int max = 0;
+        int indexMin = 0;
+        int indexMax = 0;
         int check = 0;
-
+        List<Integer> res = new ArrayList<>();
         Pair<Integer, Integer> pair = new Pair<>(0, 0);
+        Pattern pattern = Pattern.compile("([0-9]+)");
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputName)))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
+                boolean matches = line.matches(String.valueOf(pattern));
+
+                if (!matches) {
+                    throw new IllegalArgumentException();
+                }
+
                 res.add(Integer.parseInt(line));
             }
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
 
-        for (int i = 0; i < res.size() - 1; i++) {
-            if (res.get(i) < res.get(i + 1)) {
-                if (check == 0 || check > res.get(i)) {
-                    check = res.get(i);
+        for (int i = 0; i < res.size(); i++) {
 
-                    for (int j = i + 1; j < res.size(); j++) {
-                        if (res.get(i) < res.get(j)) {
-                            min = res.get(j) - res.get(i);
-                        }
-                        if (min > max) {
-                            max = min;
-                            pair = new Pair<>(i + 1, j + 1);
-                        }
-                        min = 0;
-                    }
-                }
+            if (res.get(i) < min || min == 0) {
+                min = res.get(i);
+                indexMin = i;
+                max = 0;
+                indexMax = 0;
             }
-
+            if (res.get(i) > max && min != res.get(i) || max == 0 && min != res.get(i)) {
+                max = res.get(i);
+                indexMax = i;
+            }
+            if (max - min > check) {
+                pair = new Pair<>(indexMin + 1, indexMax + 1);
+                check = max - min;
+            }
         }
         return pair;
     }
-    //Трудоемкость:O(nm)
+    // Трудоемкость:O(n)
     //Ресурсоёмкость:O(n)
 
 
@@ -136,7 +184,7 @@ public class JavaAlgorithms {
     }
 
     //Трудоемкость:O(n)
-    //Ресурсоёмкость:O(1)
+    //Ресурсоёмкость:O(n)
 
 
     /**
