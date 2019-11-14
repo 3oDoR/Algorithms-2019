@@ -366,8 +366,6 @@ public class JavaTasks {
     static <T extends Comparable<T>> void mergeArrays(T[] first, T[] second) {
         System.arraycopy(first, 0, second, 0, first.length);
         Arrays.sort(second);
-
-
     }
 
 

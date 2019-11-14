@@ -184,7 +184,7 @@ public class JavaAlgorithms {
     }
 
     //Трудоемкость:O(n)
-    //Ресурсоёмкость:O(n)
+    //Ресурсоёмкость:O(1)
 
 
     /**
@@ -249,20 +249,20 @@ public class JavaAlgorithms {
      */
     static public int calcPrimesNumber(int limit) {
         if (limit <= 1) return 0;
-        byte[] number = new byte[limit + 1];
+        boolean[] number = new boolean[limit + 1];
         int result = 0;
 
         for (int i = 2; i <= limit; i++) {
-            if (number[i] == 0) {
+            if (!number[i]) {
                 result++;
                 for (int j = 2; i * j <= limit; j++) {
-                    number[i * j] = 1;
+                    number[i * j] = true;
                 }
             }
         }
         return result;
     }
-    //Трудоемкость:O(nm)
+    //Трудоемкость:(n*log(n))
     //Ресурсоёмкость:O(n)
 
 
