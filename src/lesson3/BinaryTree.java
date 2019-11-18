@@ -239,6 +239,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         //Трудоемкость:O(1)
         //Ресурсоёмкость:O(1)
 
+
         /**
          * Поиск следующего элемента
          * Средняя
