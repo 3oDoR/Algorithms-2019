@@ -86,9 +86,15 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             if (value.compareTo(current.value) > 0) {
                 parent = current;
                 current = current.right;
+                if (current == null) {
+                    return false;
+                }
             } else {
                 parent = current;
                 current = current.left;
+                if (current == null) {
+                    return false;
+                }
             }
         }
 
@@ -144,7 +150,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
 
         if (current.left != null && current.right != null) {
 
-            Node successor = MinItem(current);
+            Node<T> successor = MinItem(current);
 
             if (current == root) {
                 root = successor;
@@ -157,24 +163,24 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             size--;
             return true;
         }
-
         return false;
     }
     //Трудоемкость:O(n)
     //n - высота дерева
 
-    private Node<T> MinItem(Node<T> deleleNode) {
+    private Node<T> MinItem(Node<T> deleteNode) {
         Node<T> successsor = null;
-        Node<T> successsorParent = null;
-        Node<T> current = deleleNode.right;
+        Node<T> successorParent = null;
+        Node<T> current = deleteNode.right;
+
         while (current != null) {
-            successsorParent = successsor;
+            successorParent = successsor;
             successsor = current;
             current = current.left;
         }
-        if (successsor != deleleNode.right) {
-            successsorParent.left = successsor.right;
-            successsor.right = deleleNode.right;
+        if (successsor != deleteNode.right) {
+            successorParent.left = successsor.right;
+            successsor.right = deleteNode.right;
         }
         return successsor;
     }
@@ -208,16 +214,19 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
 
     public class BinaryTreeIterator implements Iterator<T> {
 
-        Stack<Node<T>> stack;
+        private Node<T> next;
+        private Stack<Node<T>> stack;
 
         private BinaryTreeIterator() {
             stack = new Stack<>();
-            while (root != null) {
-                stack.push(root);
-                root = root.left;
+            next = root;
+            while (next != null) {
+                stack.push(next);
+                next = next.left;
             }
         }
-
+        //Трудоемкость:O(n)
+        //n - высота дерева
 
         /**
          * Проверка наличия следующего элемента
@@ -227,6 +236,8 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         public boolean hasNext() {
             return !stack.isEmpty();
         }
+        //Трудоемкость:O(1)
+        //Ресурсоёмкость:O(1)
 
         /**
          * Поиск следующего элемента
@@ -235,15 +246,22 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         @Override
         public T next() {
             Node<T> node = stack.pop();
+            next = node;
+
             if (node.right != null) {
                 Node<T> right = node.right;
                 while (right != null) {
-                    stack.push(right);
+                    if (!stack.contains(right)) {
+                        stack.push(right);
+                    }
                     right = right.left;
                 }
             }
-            return node.value;
+            return next.value;
         }
+        //Трудоемкость:O(n)
+        //Ресурсоёмкость:O(1)
+
 
         /**
          * Удаление следующего элемента
@@ -251,11 +269,11 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
          */
         @Override
         public void remove() {
-            // TODO
-            throw new NotImplementedError();
+            BinaryTree.this.remove(next.value);
         }
-
     }
+    //Трудоемкость:O(n)
+    //n - высота дерева
 
     @NotNull
     @Override
@@ -282,32 +300,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        SortedSet<T> sortedSet = null;
-        Node<T> current = root;
-
-
-        while ((toElement.compareTo(current.value) > 0) && current != null) {
-
-            if (current.value.compareTo(toElement) > 0) {
-                if ((current.value.compareTo(fromElement) >= 0) && (current.value.compareTo(toElement) <= 0)) {
-                    sortedSet.add(current.value);
-                }
-                if (!(current.left == null)) {
-                    current = current.left;
-                }
-            }
-            if (current.value.compareTo(toElement) < 0) {
-                if ((current.value.compareTo(fromElement) >= 0) && (current.value.compareTo(toElement) <= 0)) {
-                    sortedSet.add(current.value);
-                }
-                if (!(current.right == null)) {
-                    current = current.right;
-                }
-            }
-        }
-        return sortedSet;
-
-
+        return new SubTreeSet<>(this, fromElement, toElement);
     }
 
     /**
@@ -317,8 +310,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        return new SubTreeSet<>(this, null, toElement);
     }
 
 
@@ -329,8 +321,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        // TODO
-        throw new NotImplementedError();
+        return new SubTreeSet<>(this, fromElement, null);
     }
 
     @Override
